@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: gnet }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: gnet } }
+  template:
+    metadata: { labels: { app: gnet } }
+    spec:
+      containers:
+        - name: gnet
+          image: echo-gnet:v1
+          imagePullPolicy: IfNotPresent
+          args: ["-addr", ":8081", "-metrics", ":2113"]
+          ports:
+            - { name: tcp, containerPort: 8081 }
+            - { name: metrics, containerPort: 2113 }
+          resources:
+            requests: { cpu: "2", memory: 2Gi }
+            limits:   { cpu: "2", memory: 2Gi }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: gnet }
+spec:
+  selector: { app: gnet }
+  ports:
+    - { name: tcp, port: 8081 }
+    - { name: metrics, port: 2113 }

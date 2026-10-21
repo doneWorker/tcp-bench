@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: std }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: std } }
+  template:
+    metadata: { labels: { app: std } }
+    spec:
+      containers:
+        - name: std
+          image: echo-std:v1
+          imagePullPolicy: IfNotPresent
+          args: ["-addr", ":8080", "-metrics", ":2112"]
+          ports:
+            - { name: tcp, containerPort: 8080 }
+            - { name: metrics, containerPort: 2112 }
+          resources:
+            requests: { cpu: "2", memory: 2Gi }
+            limits:   { cpu: "2", memory: 2Gi }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: std }
+spec:
+  selector: { app: std }
+  ports:
+    - { name: tcp, port: 8080 }
+    - { name: metrics, port: 2112 }
